@@ -1,0 +1,33 @@
+import SchemaBuilder from "@pothos/core";
+import PrismaPlugin from "@pothos/plugin-prisma";
+import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
+import type PrismaTypes from "@pothos/plugin-prisma/generated";
+import type { GraphQLContext } from "../context";
+
+export const builder = new SchemaBuilder<{
+  Context: GraphQLContext;
+  PrismaTypes: PrismaTypes;
+  AuthScopes: {
+    authenticated: boolean;
+  };
+  DefaultFieldNullability: false;
+}>({
+  plugins: [ScopeAuthPlugin, PrismaPlugin],
+  scopeAuth: {
+    authScopes: async (ctx) => ({
+      authenticated: ctx.user !== null,
+    }),
+    unauthorizedError: (_parent, _args, _ctx, info) =>
+      new Error(`Not authenticated: ${info.fieldName}`),
+  },
+  prisma: {
+    client: (ctx) => ctx.prisma,
+    exposeDescriptions: true,
+    filterConnectionTotalCount: true,
+  },
+});
+
+// Declare root types here so they exist before any queryField/mutationField calls
+// in other schema modules (which are imported after this module is evaluated).
+builder.queryType({ description: "Root query type" });
+builder.mutationType({ description: "Root mutation type" });
