@@ -1,11 +1,11 @@
-# Yardscape — Full Implementation Plan
+# Hamadryad — Full Implementation Plan
 
 ## 1. Repository / Project Structure
 
 pnpm workspaces monorepo. The GraphQL schema (defined via Pothos on the server) is the contract between frontend and backend. GraphQL Code Generator consumes the schema and produces TypeScript types and Apollo hooks for the web app — no shared `packages/types` needed; the schema IS the type source.
 
 ```
-yardscape/
+hamadryad/
 ├── .claude/
 ├── .gitignore
 ├── concept.md
@@ -110,11 +110,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: yardscape
-      POSTGRES_USER: yardscape
+      POSTGRES_DB: hamadryad
+      POSTGRES_USER: hamadryad
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U yardscape"]
+      test: ["CMD-SHELL", "pg_isready -U hamadryad"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -126,7 +126,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://yardscape:${DB_PASSWORD}@db:5432/yardscape
+      DATABASE_URL: postgresql://hamadryad:${DB_PASSWORD}@db:5432/hamadryad
       JWT_SECRET: ${JWT_SECRET}
       UPLOAD_DIR: /uploads
       ALLOW_REGISTRATION: "false"

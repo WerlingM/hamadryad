@@ -10,13 +10,13 @@ COPY package.json ./
 COPY pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/
 
-RUN pnpm install --frozen-lockfile --filter @yardscape/api...
+RUN pnpm install --frozen-lockfile --filter @hamadryad/api...
 
 COPY apps/api ./apps/api
 
-RUN pnpm --filter @yardscape/api exec prisma generate
-RUN pnpm --filter @yardscape/api run build
-RUN pnpm --filter @yardscape/api deploy --prod /prod/api
+RUN pnpm --filter @hamadryad/api exec prisma generate
+RUN pnpm --filter @hamadryad/api run build
+RUN pnpm --filter @hamadryad/api deploy --prod /prod/api
 
 # ── Stage 2: runner ───────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner

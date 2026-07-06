@@ -76,3 +76,4 @@ pgdata
 # Local environment
 .env
 .envrc
+node_modules

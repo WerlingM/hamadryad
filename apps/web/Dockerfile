@@ -10,11 +10,11 @@ COPY package.json ./
 COPY pnpm-lock.yaml ./
 COPY apps/web/package.json ./apps/web/
 
-RUN pnpm install --frozen-lockfile --filter @yardscape/web...
+RUN pnpm install --frozen-lockfile --filter @hamadryad/web...
 
 COPY apps/web ./apps/web
 
-RUN pnpm --filter @yardscape/web run build
+RUN pnpm --filter @hamadryad/web run build
 
 # ── Stage 2: nginx runner ─────────────────────────────────────────────────────
 FROM nginx:1.27-alpine AS runner

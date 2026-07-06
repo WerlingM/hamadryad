@@ -45,7 +45,7 @@ export function Login() {
         fontFamily: "sans-serif",
       }}
     >
-      <h1>Yardscape</h1>
+      <h1>Hamadryad</h1>
       <form
         onSubmit={handleSubmit}
         style={{

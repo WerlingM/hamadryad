@@ -1,4 +1,4 @@
-# Yardscape Sprint 1 — Complete Implementation Plan
+# Hamadryad Sprint 1 — Complete Implementation Plan
 
 ## Overview
 
@@ -14,7 +14,7 @@ The root package has no runtime dependencies. It only coordinates scripts across
 
 ```json
 {
-  "name": "yardscape",
+  "name": "hamadryad",
   "private": true,
   "version": "0.0.1",
   "engines": {
@@ -53,7 +53,7 @@ The root package has no runtime dependencies. It only coordinates scripts across
 
 ```json
 {
-  "name": "@yardscape/api",
+  "name": "@hamadryad/api",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",
@@ -113,7 +113,7 @@ The root package has no runtime dependencies. It only coordinates scripts across
 
 ```json
 {
-  "name": "@yardscape/web",
+  "name": "@hamadryad/web",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -159,7 +159,7 @@ packages:
   - "apps/*"
 ```
 
-This single glob makes `apps/api` and `apps/web` workspace packages. Root scripts use `pnpm --filter api` (matching the `name` field `@yardscape/api`) and `pnpm --filter web`.
+This single glob makes `apps/api` and `apps/web` workspace packages. Root scripts use `pnpm --filter api` (matching the `name` field `@hamadryad/api`) and `pnpm --filter web`.
 
 ### Root script breakdown
 
@@ -187,11 +187,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: yardscape
-      POSTGRES_USER: yardscape
+      POSTGRES_DB: hamadryad
+      POSTGRES_USER: hamadryad
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U yardscape -d yardscape"]
+      test: ["CMD-SHELL", "pg_isready -U hamadryad -d hamadryad"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -207,7 +207,7 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://yardscape:${DB_PASSWORD}@db:5432/yardscape
+      DATABASE_URL: postgresql://hamadryad:${DB_PASSWORD}@db:5432/hamadryad
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_EXPIRES_IN: 15m
@@ -287,14 +287,14 @@ The `profiles: [disabled]` pattern prevents the api and web services from starti
 # Never commit .env to version control.
 
 # ── Database ─────────────────────────────────────────────────────────────────
-# Password for the yardscape PostgreSQL user.
+# Password for the hamadryad PostgreSQL user.
 # Used by Docker Compose to create the user and by DATABASE_URL at runtime.
 DB_PASSWORD=changeme
 
 # Full PostgreSQL connection string used by Prisma and the API.
 # In Docker Compose, the hostname is "db" (the service name).
 # In local dev, the DB runs on localhost:5432 via docker-compose.dev.yml.
-DATABASE_URL=postgresql://yardscape:changeme@localhost:5432/yardscape
+DATABASE_URL=postgresql://hamadryad:changeme@localhost:5432/hamadryad
 
 # ── JWT ──────────────────────────────────────────────────────────────────────
 # Secret for signing short-lived access tokens (15 min).
@@ -317,7 +317,7 @@ API_PORT=3001
 
 # Allowed CORS origin(s) for the API in production.
 # In dev, Vite proxies /graphql so CORS is not an issue.
-# In prod, set this to the domain serving the web app (e.g. https://yardscape.example.com).
+# In prod, set this to the domain serving the web app (e.g. https://hamadryad.example.com).
 CORS_ORIGIN=http://localhost:3000
 
 # ── Registration guard ────────────────────────────────────────────────────────
@@ -1229,7 +1229,7 @@ COPY apps/api/package.json ./apps/api/
 # Install only production + dev dependencies for the api workspace.
 # --frozen-lockfile ensures reproducibility.
 COPY pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --filter @yardscape/api...
+RUN pnpm install --frozen-lockfile --filter @hamadryad/api...
 
 # Copy source
 COPY apps/api ./apps/api
@@ -1341,7 +1341,7 @@ The Vite entry HTML. The `id="root"` div is the React mount point.
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Yardscape</title>
+    <title>Hamadryad</title>
   </head>
   <body>
     <div id="root"></div>
@@ -1866,7 +1866,7 @@ export function Login() {
         fontFamily: "sans-serif",
       }}
     >
-      <h1>Yardscape</h1>
+      <h1>Hamadryad</h1>
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "12px", width: "300px" }}
@@ -1948,7 +1948,7 @@ COPY package.json ./
 COPY apps/web/package.json ./apps/web/
 
 COPY pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --filter @yardscape/web...
+RUN pnpm install --frozen-lockfile --filter @hamadryad/web...
 
 COPY apps/web ./apps/web
 
@@ -2177,8 +2177,8 @@ cp .env.example .env
 ```
 
 Then open `.env` and set:
-- `DB_PASSWORD`: any strong password (e.g., `yardscape_dev_pw`)
-- `DATABASE_URL`: `postgresql://yardscape:yardscape_dev_pw@localhost:5432/yardscape`
+- `DB_PASSWORD`: any strong password (e.g., `hamadryad_dev_pw`)
+- `DATABASE_URL`: `postgresql://hamadryad:hamadryad_dev_pw@localhost:5432/hamadryad`
 - `JWT_SECRET`: generate with `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`
 - `JWT_REFRESH_SECRET`: generate another random hex with the same command
 - `SEED_ADMIN_EMAIL`: your email
@@ -2336,7 +2336,7 @@ The API container will run `prisma migrate deploy` on startup (the seed is not r
 For reference, every file that needs to be created for Sprint 1:
 
 ```
-yardscape/
+hamadryad/
 ├── .gitignore
 ├── .env.example
 ├── pnpm-workspace.yaml
@@ -2400,8 +2400,68 @@ yardscape/
 
 ### Critical Files for Implementation
 
-- `/home/mike/workspace/yardscape/apps/api/src/schema/builder.ts`
-- `/home/mike/workspace/yardscape/apps/api/src/schema/index.ts`
-- `/home/mike/workspace/yardscape/apps/api/prisma/schema.prisma`
-- `/home/mike/workspace/yardscape/apps/web/src/apollo.ts`
-- `/home/mike/workspace/yardscape/codegen.ts`
+- `apps/api/src/schema/builder.ts`
+- `apps/api/src/schema/index.ts`
+- `apps/api/prisma/schema.prisma`
+- `apps/web/src/apollo.ts`
+- `codegen.ts`
+
+---
+
+## Status & Continuation Notes
+
+**Last updated:** 2026-07-05
+
+### Completed
+
+- [x] All Sprint 1 files written and committed to `feature/sprint1-scaffolding`
+- [x] App renamed from Yardscape → **Hamadryad** across all package names, DB config, and UI strings
+- [x] `pnpm-workspace.yaml` updated with `allowBuilds` entries (blocks native build scripts for security: `@apollo/protobufjs`, `@prisma/client`, `@prisma/engines`, `esbuild`, `prisma`)
+- [x] `pnpm install` run — `pnpm-lock.yaml` generated
+- [x] `.env` configured (copied from `.env.example`, credentials set)
+
+### Remaining to complete Sprint 1
+
+Run these in order from the repo root:
+
+```bash
+# 1. Start the database (Docker must be running)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up db -d
+
+# 2. Wait for healthy, then run initial migration
+#    When prompted for migration name, enter: init_user
+pnpm db:migrate
+
+# 3. Seed the admin user
+pnpm seed
+
+# 4. Start dev servers (two terminals, or one with pnpm dev)
+pnpm --filter @hamadryad/api dev    # terminal 1 — API on :3001
+pnpm --filter @hamadryad/web dev    # terminal 2 — web on :5173
+
+# 5. Run codegen (API must be running)
+pnpm codegen
+
+# 6. Verify
+#    Open http://localhost:5173
+#    → redirects to /login
+#    → log in with SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD
+#    → lands on /homes showing "Welcome, [displayName]"
+#    → Apollo DevTools: run { me { id email displayName } } — returns the user
+```
+
+### Known items to watch
+
+- `pnpm-workspace.yaml` has `allowBuilds` blocking native postinstall scripts. If Prisma client generation fails during `pnpm db:migrate`, run `pnpm --filter @hamadryad/api exec prisma generate` manually.
+- The `@pothos/plugin-prisma` Pothos type map is generated by `prisma generate` and output to `node_modules/@pothos/plugin-prisma/generated.d.ts`. This must exist before the API TypeScript compiles — `pnpm db:migrate` triggers it automatically.
+- `apps/web/src/gql/graphql.ts` is currently the hand-written Sprint 1 stub. After step 5 above (`pnpm codegen`), it will be replaced by the generated file. The shapes match so no component code changes.
+
+### Sprint 2 preview
+
+Once Sprint 1 is verified working, Sprint 2 adds Home + Yard CRUD:
+- `Home`, `HomeMember`, `Yard` Prisma models + migration
+- Pothos types for `Home`, `Yard`, `HomeMember`
+- `homes` / `home(id)` root queries with `yards(filter: YardFilter)` field
+- `createHome`, `updateHome`, `deleteHome`, `createYard`, `updateYard`, `deleteYard` mutations
+- Homes list page replacing the Sprint 1 placeholder
+- Yard management UI within home detail

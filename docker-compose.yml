@@ -7,11 +7,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: yardscape
-      POSTGRES_USER: yardscape
+      POSTGRES_DB: hamadryad
+      POSTGRES_USER: hamadryad
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U yardscape -d yardscape"]
+      test: ["CMD-SHELL", "pg_isready -U hamadryad -d hamadryad"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -27,7 +27,7 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://yardscape:${DB_PASSWORD}@db:5432/yardscape
+      DATABASE_URL: postgresql://hamadryad:${DB_PASSWORD}@db:5432/hamadryad
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_EXPIRES_IN: 15m
