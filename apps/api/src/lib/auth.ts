@@ -37,7 +37,7 @@ export function signAccessToken(
   return jwt.sign(
     { ...payload, type: "access" },
     getSecret("JWT_SECRET"),
-    { expiresIn: process.env.JWT_EXPIRES_IN ?? "15m" }
+    { expiresIn: (process.env.JWT_EXPIRES_IN ?? "15m") as jwt.SignOptions["expiresIn"] }
   );
 }
 
@@ -45,7 +45,7 @@ export function signRefreshToken(userId: string): string {
   return jwt.sign(
     { sub: userId, type: "refresh" },
     getSecret("JWT_REFRESH_SECRET"),
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "30d" }
+    { expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? "30d") as jwt.SignOptions["expiresIn"] }
   );
 }
 

@@ -62,7 +62,6 @@ builder.mutationField("login", (t) =>
 
       const user = await ctx.prisma.user.findUnique({
         where: { email: parsed.data.email },
-        select: { id: true, email: true, displayName: true, passwordHash: true },
       });
 
       // Use a dummy hash when user not found to prevent email enumeration via timing.
@@ -81,10 +80,7 @@ builder.mutationField("login", (t) =>
 
       setRefreshCookie(ctx.res, refreshToken);
 
-      return {
-        token: accessToken,
-        user: { id: user.id, email: user.email, displayName: user.displayName },
-      };
+      return { token: accessToken, user };
     },
   })
 );
@@ -128,7 +124,6 @@ builder.mutationField("register", (t) =>
           displayName: parsed.data.displayName,
           passwordHash: hash,
         },
-        select: { id: true, email: true, displayName: true },
       });
 
       const accessToken = signAccessToken({ sub: user.id, email: user.email });

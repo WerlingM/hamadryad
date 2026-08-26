@@ -1,7 +1,7 @@
 import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
-import type PrismaTypes from "@pothos/plugin-prisma/generated";
+import PrismaTypes, { getDatamodel } from "@pothos/plugin-prisma/generated";
 import type { GraphQLContext } from "../context";
 
 export const builder = new SchemaBuilder<{
@@ -11,17 +11,24 @@ export const builder = new SchemaBuilder<{
     authenticated: boolean;
   };
   DefaultFieldNullability: false;
+  Scalars: {
+    DateTime: { Input: Date | string; Output: Date | string };
+    Date: { Input: Date | string; Output: Date | string };
+    JSON: { Input: unknown; Output: unknown };
+  };
 }>({
   plugins: [ScopeAuthPlugin, PrismaPlugin],
+  defaultFieldNullability: false,
   scopeAuth: {
     authScopes: async (ctx) => ({
       authenticated: ctx.user !== null,
     }),
-    unauthorizedError: (_parent, _args, _ctx, info) =>
+    unauthorizedError: (_parent, _ctx, info) =>
       new Error(`Not authenticated: ${info.fieldName}`),
   },
   prisma: {
     client: (ctx) => ctx.prisma,
+    dmmf: getDatamodel(),
     exposeDescriptions: true,
     filterConnectionTotalCount: true,
   },

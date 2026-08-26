@@ -1,8 +1,10 @@
+import type { User } from "@prisma/client";
 import { builder } from "../builder";
+import { UserRef } from "./user";
 
 export const AuthPayloadRef = builder.objectRef<{
   token: string;
-  user: { id: string; email: string; displayName: string };
+  user: User;
 }>("AuthPayload");
 
 AuthPayloadRef.implement({
@@ -10,7 +12,7 @@ AuthPayloadRef.implement({
   fields: (t) => ({
     token: t.exposeString("token"),
     user: t.field({
-      type: "User",
+      type: UserRef,
       resolve: (parent) => parent.user,
     }),
   }),
