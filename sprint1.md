@@ -1,5 +1,15 @@
 # Hamadryad Sprint 1 — Complete Implementation Plan
 
+## Status: ✅ Complete (verified 2026-08-24)
+
+Every file described below exists and matches this plan. After the initial scaffolding, a dependency upgrade (`@pothos/plugin-prisma` → 4.14.3, `jsonwebtoken`/`@types/jsonwebtoken` → 9.0.3/9.0.10) broke the build in five places; all were fixed and the full login flow was re-verified against a running API + Postgres:
+
+1. **`schema.prisma`** — `generator pothos` needs `generateDatamodel = "true"` so `@pothos/plugin-prisma` emits a runtime `generated.js` (not just the `.d.ts`) containing `getDatamodel()`. Without it there's no DMMF at runtime.
+2. **`builder.ts`** — newer `@pothos/plugin-prisma` requires a `dmmf: { datamodel }` option alongside `client`. `dmmf: getDatamodel()` is correct as-is (the function already returns the `{ datamodel }` wrapper — do not re-wrap it, that double-nests `models` and crashes `createRelationMap` at startup). Also added a `Scalars` entry to the builder's generic so `DateTime`/`Date`/`JSON` are valid names for `addScalarType`, and `defaultFieldNullability: false` is now a required runtime option (not just a type param). `scopeAuth.unauthorizedError`'s signature also changed to `(parent, context, info, result)`.
+3. **`lib/auth.ts`** — newer `@types/jsonwebtoken` types `expiresIn` as `StringValue | number` (from the `ms` package) instead of plain `string`; env-var-sourced values need a cast (`as jwt.SignOptions["expiresIn"]`) since they're inherently untyped at the boundary.
+4. **`schema/types/auth.ts`** — `AuthPayload.user` must reference the `User` Pothos type via its exported `ObjectRef` (`UserRef` from `types/user.ts`), not the bare string `"User"`. Plain string type params only resolve against `Types['outputShapes']`, which doesn't include Prisma-object names outside of `t.prismaField`. This also meant `login`/`register` needed to return the full Prisma `User` row (not a hand-picked `{id, email, displayName}` subset) so the resolver's parent shape satisfies the `User` ref — the extra fields (`passwordHash`, `createdAt`, `updatedAt`) are never exposed since `UserRef` only declares `id`/`email`/`displayName` fields.
+5. **`apps/web/src/gql/graphql.ts`** — codegen only emits typed hooks (`useLoginMutation`, etc.) for operations backed by a co-located `.graphql` file; there were none, so hooks silently disappeared on regeneration. Added `apps/web/src/pages/Login.graphql` and re-ran `pnpm codegen` against a live API.
+
 ## Overview
 
 Sprint 1 delivers a running full-stack skeleton: PostgreSQL with PostGIS running in Docker, a Node.js/TypeScript API with Apollo Server 4 and a `me` query + `login` mutation, and a React frontend with a login page that stores a JWT in Zustand and redirects to a protected `/homes` placeholder. When complete, `docker compose up` starts the DB, `pnpm dev` starts the API and web, a seeded user can log in, and Apollo DevTools confirms `me` returns the user.
@@ -2410,7 +2420,7 @@ hamadryad/
 
 ## Status & Continuation Notes
 
-**Last updated:** 2026-07-05
+**Last updated:** 2026-10-17 — all steps below have been completed and verified (see Status at top). Kept for reference when setting up a new machine.
 
 ### Completed
 
@@ -2420,7 +2430,7 @@ hamadryad/
 - [x] `pnpm install` run — `pnpm-lock.yaml` generated
 - [x] `.env` configured (copied from `.env.example`, credentials set)
 
-### Remaining to complete Sprint 1
+### Setup steps (completed)
 
 Run these in order from the repo root:
 

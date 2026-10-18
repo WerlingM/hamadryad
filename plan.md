@@ -763,24 +763,26 @@ Each sprint delivers working, deployable software. Sized for roughly one focused
 
 ---
 
-### Sprint 1 — Foundation
+### Sprint 1 — Foundation ✅ COMPLETE
 
 **Goal:** Running full-stack skeleton with GraphQL endpoint, login works, deployable via Docker Compose.
 
-- pnpm workspace with `apps/api`, `apps/web`
-- Prisma schema: `User` table + initial migration, PostGIS extension enabled
-- Apollo Server 4 + Pothos `SchemaBuilder` wired into Express
-- `scalars.ts`: DateTime, Date, JSON scalars registered
-- `me` query + `login` mutation (returns JWT)
-- `POST /auth/refresh` REST endpoint + httpOnly cookie rotation
-- GraphQL Code Generator config (`codegen.ts`) — generates types to `apps/web/src/gql/`
-- Apollo Client instance in `apps/web`
-- Login page using `useLoginMutation` (generated hook)
-- `authStore` in Zustand, protected route wrapper
-- `docker-compose.yml` + `docker-compose.dev.yml`
-- `.env.example`, root `pnpm dev` script
+- [x] pnpm workspace with `apps/api`, `apps/web`
+- [x] Prisma schema: `User` table + initial migration, PostGIS extension enabled
+- [x] Apollo Server 4 + Pothos `SchemaBuilder` wired into Express
+- [x] `scalars.ts`: DateTime, Date, JSON scalars registered
+- [x] `me` query + `login` mutation (returns JWT)
+- [x] `POST /auth/refresh` REST endpoint + httpOnly cookie rotation
+- [x] GraphQL Code Generator config (`codegen.ts`) — generates types to `apps/web/src/gql/`
+- [x] Apollo Client instance in `apps/web`
+- [x] Login page using `useLoginMutation` (generated hook)
+- [x] `authStore` in Zustand, protected route wrapper
+- [x] `docker-compose.yml` + `docker-compose.dev.yml` (podman-compatible)
+- [x] `.env.example`, root `pnpm dev` script
 
 **Done when:** `docker compose up` starts DB; `pnpm dev` starts API + web; seeded user can log in; Apollo DevTools shows the `me` query returning the user.
+
+**Status:** Verified end-to-end (2026-08-24) — seeded admin logs in via the `login` mutation, `me` resolves the authenticated user with the returned token, and both `apps/api` and `apps/web` typecheck cleanly. See `sprint1.md` for the post-scaffolding dependency-upgrade fixes that were required (Pothos/Prisma dmmf wiring, scalar type params, jsonwebtoken types, codegen hooks).
 
 ---
 
