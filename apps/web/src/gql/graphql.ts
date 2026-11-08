@@ -27,6 +27,26 @@ export type AuthPayload = {
   user: User;
 };
 
+export type Bed = {
+  __typename?: 'Bed';
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  /** Bed outline as a GeoJSON Polygon geometry. */
+  geometry?: Maybe<Scalars['JSON']['output']>;
+  id: Scalars['ID']['output'];
+  moisture: Moisture;
+  name: Scalars['String']['output'];
+  sortOrder: Scalars['Int']['output'];
+  sunlight: Sunlight;
+  updatedAt: Scalars['DateTime']['output'];
+  yard: Yard;
+};
+
+export type BedFilter = {
+  moisture?: InputMaybe<Moisture>;
+  sunlight?: InputMaybe<Sunlight>;
+};
+
 export type CreateHomeInput = {
   address: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -78,6 +98,12 @@ export type MemberRole =
   | 'OWNER'
   | 'VIEWER';
 
+export type Moisture =
+  | 'AVERAGE'
+  | 'DRY'
+  | 'MOIST'
+  | 'WET';
+
 /** Root mutation type */
 export type Mutation = {
   __typename?: 'Mutation';
@@ -85,6 +111,8 @@ export type Mutation = {
   createYard: Yard;
   deleteHome: Scalars['Boolean']['output'];
   deleteYard: Scalars['Boolean']['output'];
+  /** Replace the home's parcel boundary from GeoJSON text (FeatureCollection, Feature, or Polygon/MultiPolygon in WGS 84). */
+  importParcel: Home;
   login: AuthPayload;
   register: AuthPayload;
   updateHome: Home;
@@ -114,6 +142,13 @@ export type MutationDeleteHomeArgs = {
 /** Root mutation type */
 export type MutationDeleteYardArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+/** Root mutation type */
+export type MutationImportParcelArgs = {
+  geoJson: Scalars['String']['input'];
+  homeId: Scalars['ID']['input'];
 };
 
 
@@ -164,6 +199,11 @@ export type RegisterInput = {
   password: Scalars['String']['input'];
 };
 
+export type Sunlight =
+  | 'FULL_SHADE'
+  | 'FULL_SUN'
+  | 'PART_SHADE';
+
 export type UpdateHomeInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -186,6 +226,7 @@ export type User = {
 
 export type Yard = {
   __typename?: 'Yard';
+  beds: Array<Bed>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   home: Home;
@@ -194,6 +235,11 @@ export type Yard = {
   name: Scalars['String']['output'];
   sortOrder: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+
+export type YardBedsArgs = {
+  filter?: InputMaybe<BedFilter>;
 };
 
 export type YardFilter = {
@@ -213,7 +259,7 @@ export type CreateYardMutationVariables = Exact<{
 }>;
 
 
-export type CreateYardMutation = { __typename?: 'Mutation', createYard: { __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number } };
+export type CreateYardMutation = { __typename?: 'Mutation', createYard: { __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number, beds: Array<{ __typename?: 'Bed', id: string, name: string }> } };
 
 export type UpdateYardMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -221,7 +267,7 @@ export type UpdateYardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateYardMutation = { __typename?: 'Mutation', updateYard: { __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number } };
+export type UpdateYardMutation = { __typename?: 'Mutation', updateYard: { __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number, beds: Array<{ __typename?: 'Bed', id: string, name: string }> } };
 
 export type DeleteYardMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -239,7 +285,7 @@ export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'Au
 
 export type HomeSummaryFragment = { __typename?: 'Home', id: string, name: string, address: string, notes?: string | null, myRole?: MemberRole | null };
 
-export type YardFieldsFragment = { __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number };
+export type YardFieldsFragment = { __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number, beds: Array<{ __typename?: 'Bed', id: string, name: string }> };
 
 export type HomesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -251,7 +297,7 @@ export type HomeQueryVariables = Exact<{
 }>;
 
 
-export type HomeQuery = { __typename?: 'Query', home?: { __typename?: 'Home', id: string, name: string, address: string, notes?: string | null, myRole?: MemberRole | null, yards: Array<{ __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number }> } | null };
+export type HomeQuery = { __typename?: 'Query', home?: { __typename?: 'Home', parcelGeoJson?: unknown | null, id: string, name: string, address: string, notes?: string | null, myRole?: MemberRole | null, yards: Array<{ __typename?: 'Yard', id: string, name: string, location: YardLocation, description?: string | null, sortOrder: number, beds: Array<{ __typename?: 'Bed', id: string, name: string }> }> } | null };
 
 export type CreateHomeMutationVariables = Exact<{
   input: CreateHomeInput;
@@ -275,6 +321,14 @@ export type DeleteHomeMutationVariables = Exact<{
 
 export type DeleteHomeMutation = { __typename?: 'Mutation', deleteHome: boolean };
 
+export type ImportParcelMutationVariables = Exact<{
+  homeId: Scalars['ID']['input'];
+  geoJson: Scalars['String']['input'];
+}>;
+
+
+export type ImportParcelMutation = { __typename?: 'Mutation', importParcel: { __typename?: 'Home', id: string, parcelGeoJson?: unknown | null, updatedAt: string } };
+
 export const HomeSummaryFragmentDoc = gql`
     fragment HomeSummary on Home {
   id
@@ -291,6 +345,10 @@ export const YardFieldsFragmentDoc = gql`
   location
   description
   sortOrder
+  beds {
+    id
+    name
+  }
 }
     `;
 export const CreateYardDocument = gql`
@@ -480,6 +538,7 @@ export const HomeDocument = gql`
     query Home($id: ID!) {
   home(id: $id) {
     ...HomeSummary
+    parcelGeoJson
     yards {
       ...YardFields
     }
@@ -621,3 +680,39 @@ export function useDeleteHomeMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteHomeMutationHookResult = ReturnType<typeof useDeleteHomeMutation>;
 export type DeleteHomeMutationResult = Apollo.MutationResult<DeleteHomeMutation>;
 export type DeleteHomeMutationOptions = Apollo.BaseMutationOptions<DeleteHomeMutation, DeleteHomeMutationVariables>;
+export const ImportParcelDocument = gql`
+    mutation ImportParcel($homeId: ID!, $geoJson: String!) {
+  importParcel(homeId: $homeId, geoJson: $geoJson) {
+    id
+    parcelGeoJson
+    updatedAt
+  }
+}
+    `;
+export type ImportParcelMutationFn = Apollo.MutationFunction<ImportParcelMutation, ImportParcelMutationVariables>;
+
+/**
+ * __useImportParcelMutation__
+ *
+ * To run a mutation, you first call `useImportParcelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImportParcelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [importParcelMutation, { data, loading, error }] = useImportParcelMutation({
+ *   variables: {
+ *      homeId: // value for 'homeId'
+ *      geoJson: // value for 'geoJson'
+ *   },
+ * });
+ */
+export function useImportParcelMutation(baseOptions?: Apollo.MutationHookOptions<ImportParcelMutation, ImportParcelMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ImportParcelMutation, ImportParcelMutationVariables>(ImportParcelDocument, options);
+      }
+export type ImportParcelMutationHookResult = ReturnType<typeof useImportParcelMutation>;
+export type ImportParcelMutationResult = Apollo.MutationResult<ImportParcelMutation>;
+export type ImportParcelMutationOptions = Apollo.BaseMutationOptions<ImportParcelMutation, ImportParcelMutationVariables>;

@@ -10,7 +10,7 @@ Home → Yard → Bed → Planting → CatalogSpecies
 
 A `Home` is a property (e.g., "Suburban Home", "Richmond Rental"). Each home has one or more `Yard`s (front, back, side). Each yard has `Bed`s, the primary organizational unit — a bed is a drawn polygon with sunlight/moisture attributes. Each bed holds `Planting`s, which are instances of a shared `CatalogSpecies` (e.g., "Purple Coneflower / *Echinacea purpurea*"). The catalog is shared across all homes and users, so a planting that thrived at one property is an easy candidate to suggest at another.
 
-**Built today:** `User`, `Home`, `HomeMember`, and `Yard`. Everything below them is planned schema for future sprints — see the [roadmap](../../plan.md#3-database-schema) for the section this is drawn from and when each entity lands.
+**Built today:** `User`, `Home`, `HomeMember`, `Yard`, and `Bed`. Everything below them is planned schema for future sprints — see the [roadmap](../../plan.md#3-database-schema) for the section this is drawn from and when each entity lands.
 
 ## Entities
 
@@ -30,8 +30,8 @@ A `Home` is a property (e.g., "Suburban Home", "Richmond Rental"). Each home has
 | name | TEXT | |
 | address | TEXT | |
 | notes | TEXT | nullable |
-| parcelGeometry | geometry(MultiPolygon,4326) | via raw SQL, nullable — *added in Sprint 3* |
-| parcelGeoJson | JSONB | raw imported GeoJSON, nullable |
+| parcelGeometry | geometry(MultiPolygon,4326) | via raw SQL, nullable; for spatial queries |
+| parcelGeoJson | JSONB | the same boundary as a GeoJSON MultiPolygon, nullable; used for rendering |
 | ownerId | UUID FK → User | |
 
 ### HomeMember *(implemented)*
@@ -47,9 +47,11 @@ Join table granting a `User` a `role` (`OWNER` / `EDITOR` / `VIEWER`) on a `Home
 | description | TEXT | nullable |
 | sortOrder | INT | display order within the home; new yards go last |
 
-Deleting a home cascades to its memberships and yards.
+Deleting a home cascades to its memberships, yards, and beds.
 
-### Bed *(planned)*
+On import, the uploaded file is reduced to one 2D MultiPolygon (all polygons in the file, other geometry ignored), repaired with `ST_MakeValid`, and written to both parcel columns together, so they always match. The original file isn't kept.
+
+### Bed *(implemented; created from the app in Sprint 4)*
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID PK | |
@@ -57,7 +59,8 @@ Deleting a home cascades to its memberships and yards.
 | name | TEXT | |
 | sunlight | ENUM | `FULL_SUN` / `PART_SHADE` / `FULL_SHADE` |
 | moisture | ENUM | `DRY` / `AVERAGE` / `MOIST` / `WET` |
-| geometry | geometry(Polygon,4326) | via raw SQL |
+| description | TEXT | nullable |
+| geometry | geometry(Polygon,4326) | via raw SQL, nullable |
 | sortOrder | INT | |
 
 `BedComment` attaches a timestamped, user-attributed comment log to a bed.

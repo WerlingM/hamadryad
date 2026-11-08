@@ -804,7 +804,7 @@ Each sprint delivers working, deployable software. Sized for roughly one focused
 
 ---
 
-### Sprint 3 — The Map
+### Sprint 3 — The Map (done 2026-11-08)
 
 **Goal:** Home map page displays base map with parcel boundary.
 

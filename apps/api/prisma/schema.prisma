@@ -47,8 +47,10 @@ model Home {
   name          String
   address       String
   notes         String?
-  /// Raw imported parcel GeoJSON. The PostGIS geometry column arrives in Sprint 3.
-  parcelGeoJson Json?
+  /// Normalized parcel boundary (MultiPolygon GeoJSON geometry) for rendering.
+  parcelGeoJson  Json?
+  /// Same boundary as PostGIS geometry for spatial queries. Read/written with raw SQL.
+  parcelGeometry Unsupported("geometry(MultiPolygon, 4326)")?
   ownerId       String   @db.Uuid
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -58,6 +60,7 @@ model Home {
   yards   Yard[]
 
   @@index([ownerId])
+  @@index([parcelGeometry], type: Gist)
   @@map("homes")
 }
 
@@ -85,8 +88,42 @@ model Yard {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  home Home  @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  beds Bed[]
 
   @@index([homeId])
   @@map("yards")
+}
+
+enum Sunlight {
+  FULL_SUN
+  PART_SHADE
+  FULL_SHADE
+}
+
+enum Moisture {
+  DRY
+  AVERAGE
+  MOIST
+  WET
+}
+
+model Bed {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  yardId      String   @db.Uuid
+  name        String
+  description String?
+  sunlight    Sunlight
+  moisture    Moisture
+  /// Bed outline. Read/written with raw SQL (ST_AsGeoJSON / ST_GeomFromGeoJSON).
+  geometry    Unsupported("geometry(Polygon, 4326)")?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  yard Yard @relation(fields: [yardId], references: [id], onDelete: Cascade)
+
+  @@index([yardId])
+  @@index([geometry], type: Gist)
+  @@map("beds")
 }

@@ -16,4 +16,4 @@ Hamadryad is a full-stack app for planning, visualizing, and tracking residentia
 
 ## Current status
 
-Sprints 1 and 2 are built: authentication, the GraphQL API, and home and yard management (list, create, edit, delete homes; add, rename, delete yards) with membership-based access control. The map, plant catalog, plantings, irrigation, and reporting are planned but not yet built. See the [roadmap](../plan.md) for what's next.
+Sprints 1–3 are built: authentication, the GraphQL API, home and yard management with membership-based access control, and the home map (street or satellite base map with an imported lot boundary). Bed drawing, the plant catalog, plantings, irrigation, and reporting are planned but not yet built. See the [roadmap](../plan.md) for what's next.

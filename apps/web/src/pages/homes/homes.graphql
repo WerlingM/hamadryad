@@ -12,6 +12,10 @@ fragment YardFields on Yard {
   location
   description
   sortOrder
+  beds {
+    id
+    name
+  }
 }
 
 query Homes {
@@ -27,6 +31,7 @@ query Homes {
 query Home($id: ID!) {
   home(id: $id) {
     ...HomeSummary
+    parcelGeoJson
     yards {
       ...YardFields
     }
@@ -47,4 +52,12 @@ mutation UpdateHome($id: ID!, $input: UpdateHomeInput!) {
 
 mutation DeleteHome($id: ID!) {
   deleteHome(id: $id)
+}
+
+mutation ImportParcel($homeId: ID!, $geoJson: String!) {
+  importParcel(homeId: $homeId, geoJson: $geoJson) {
+    id
+    parcelGeoJson
+    updatedAt
+  }
 }

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "./lib/prisma";
 import { verifyAccessToken } from "./lib/auth";
+import { createLoaders, type Loaders } from "./lib/loaders";
 
 export interface GraphQLContext {
   req: Request;
@@ -11,6 +12,7 @@ export interface GraphQLContext {
     displayName: string;
   } | null;
   prisma: typeof prisma;
+  loaders: Loaders;
 }
 
 export async function createContext({
@@ -37,5 +39,5 @@ export async function createContext({
     }
   }
 
-  return { req, res, user, prisma };
+  return { req, res, user, prisma, loaders: createLoaders(prisma) };
 }

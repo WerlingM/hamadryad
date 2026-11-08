@@ -41,4 +41,4 @@ See [Data Model](data-model.md) for the entity schema and [API Design](api.md) f
 
 ## Status
 
-`User`, `Home`, `HomeMember`, and `Yard` exist today (Sprints 1–2). The rest of the hierarchy in [Data Model](data-model.md) — beds, plantings, the catalog, irrigation — is the target schema for later sprints; see the [roadmap](../../plan.md) for sequencing.
+`User`, `Home` (including its parcel boundary), `HomeMember`, `Yard`, and `Bed` exist today (Sprints 1–3); beds can't be created from the app until Sprint 4. The rest of the hierarchy in [Data Model](data-model.md) — plantings, the catalog, irrigation — is the target schema for later sprints; see the [roadmap](../../plan.md) for sequencing.

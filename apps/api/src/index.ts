@@ -35,7 +35,8 @@ async function main() {
   );
 
   app.use(cookieParser());
-  app.use(express.json());
+  // Parcel GeoJSON uploads can exceed the 100 KB default.
+  app.use(express.json({ limit: "5mb" }));
 
   // ── REST: token refresh ────────────────────────────────────────────────────
   app.post("/auth/refresh", async (req, res) => {

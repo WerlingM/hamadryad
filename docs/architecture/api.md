@@ -48,5 +48,8 @@ Error codes the client can rely on: `UNAUTHENTICATED` (missing/expired token —
 
 - **Sprint 1:** `me`, `login`, `register`.
 - **Sprint 2:** `homes`, `home(id)`, `Home.yards(filter: YardFilter)` (filter by `location`, ordered by `sortOrder`), `Home.members`, `Home.myRole`, and `createHome` / `updateHome` / `deleteHome`, `createYard` / `updateYard` / `deleteYard`.
+- **Sprint 3:** `Home.parcelGeoJson`, `importParcel(homeId, geoJson)` (owners and editors), and the read-only `Bed` type via `Yard.beds(filter: BedFilter)` (filter by `sunlight` / `moisture`). `Bed.geometry` is read with PostGIS through a per-request DataLoader (`apps/api/src/lib/loaders.ts`), so a page of beds costs one query.
+
+`importParcel` accepts a FeatureCollection, Feature, or bare Polygon/MultiPolygon in WGS 84 longitude/latitude. It rejects files in other coordinate systems (a common county GIS default) with a message asking for an EPSG:4326 export, drops elevation values, closes open rings, and caps files at 100,000 points (requests are capped at 5 MB).
 
 The live schema is the source of truth — introspect `http://localhost:3001/graphql` or read `apps/api/src/schema/`. The full target schema (beds, plantings, catalog, irrigation, reports) is specified in the [roadmap](../../plan.md#4-backend-api-design--graphql) and lands incrementally over the following sprints.

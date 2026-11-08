@@ -4,7 +4,7 @@ description: Where development left off (as of 2026-11-08) and what to pick up n
 metadata:
   type: project
 ---
-**As of 2026-11-08:** Sprint 1 merged to `main` and pushed. Sprint 2 (Homes & Yards, see `plan.md` Sprint 2) complete on branch `feature/sprint2-homes-yards` (API verified via curl, UI verified by user in browser 2026-11-08). Next: merge to `main`, then Sprint 3 (The Map).
+**As of 2026-11-08:** Sprints 1–2 merged to `main` and pushed. Sprint 3 (The Map) complete on branch `feature/sprint3-map`: parcel import and display verified in browser by the user. Next: commit/merge, then Sprint 4.
 
 **New machine setup gotchas:**
 - `.env` is gitignored — recreate from `.env.example` (DB credentials, JWT secrets, SEED_ADMIN_*).

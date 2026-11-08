@@ -27,13 +27,14 @@ apps/
       schema.prisma      database schema (source of truth)
       migrations/
       seed.ts            admin user + sample homes (seedHomes.ts)
+      fixtures/          sample-parcel.geojson for testing parcel import
   web/                  React (Vite) frontend
     src/
       apollo.ts          Apollo Client instance (auth header, token refresh + retry)
       router.tsx         React Router route table
-      stores/            Zustand stores (auth token, future UI state)
+      stores/            Zustand stores (auth token, map UI state)
       pages/             route-level components, with co-located .graphql operations
-      components/        reusable pieces (layout, ui styles, homes, yards)
+      components/        reusable pieces (layout, ui styles, homes, yards, map)
       lib/               small shared helpers (labels, roles, error messages)
       gql/graphql.ts      generated types + Apollo hooks — do not hand-edit
 docs/                   this documentation
@@ -71,6 +72,10 @@ The returned `token` can be passed as `Authorization: Bearer <token>` on a follo
 ## Known gotchas
 
 `apps/api`'s Pothos/Prisma/JWT dependency wiring is more brittle than it looks — a version bump broke five things at once (DMMF wiring, scalar type params, JWT option types, and GraphQL codegen hooks). See [Sprint 1 build notes](../../sprint1.md#status--complete-verified-2026-08-24) for exactly what broke and why, before re-touching `schema/builder.ts` or the Prisma generator config.
+
+### MapLibre's web worker
+
+MapLibre GL 6 loads a separate worker file (`maplibre-gl-worker.mjs`) that it normally finds next to its own module. Bundling breaks that, so `apps/web/src/components/map/maplibre.ts` imports the worker as a Vite `?url` asset and passes it to `setWorkerUrl`. The package's `exports` map hides its `dist/` folder, so `vite.config.ts` defines a `~maplibre-gl-dist` alias (the `~` stops Vite from pre-bundling it in dev). The worker is an ES module, so it must be served with a JavaScript MIME type: `apps/web/nginx.conf` sets that for `.mjs`, which nginx doesn't map by default. Always import MapLibre through `components/map/maplibre.ts`.
 
 ## Deployment
 

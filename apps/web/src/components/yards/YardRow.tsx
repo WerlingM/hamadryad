@@ -12,6 +12,7 @@ interface YardRowProps {
 
 export function YardRow({ yard, editable }: YardRowProps) {
   const [editing, setEditing] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updateYard] = useUpdateYardMutation();
   const [deleteYard, { loading: deleting }] = useDeleteYardMutation({
@@ -58,11 +59,18 @@ export function YardRow({ yard, editable }: YardRowProps) {
   return (
     <li style={card}>
       <div style={{ ...row, justifyContent: "space-between" }}>
-        <div>
-          <strong>{yard.name}</strong>
-          <p style={muted}>{YARD_LOCATION_LABELS[yard.location]}</p>
-          {yard.description && <p style={muted}>{yard.description}</p>}
-        </div>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          style={{ background: "none", border: "none", padding: 0, textAlign: "left", cursor: "pointer", font: "inherit" }}
+        >
+          <strong>
+            {expanded ? "▾" : "▸"} {yard.name}
+          </strong>
+          <p style={muted}>
+            {YARD_LOCATION_LABELS[yard.location]} · {yard.beds.length} {yard.beds.length === 1 ? "bed" : "beds"}
+          </p>
+        </button>
         {editable && (
           <div style={row}>
             <button style={button} onClick={() => setEditing(true)}>
@@ -74,6 +82,20 @@ export function YardRow({ yard, editable }: YardRowProps) {
           </div>
         )}
       </div>
+      {expanded && (
+        <div style={{ marginTop: "8px", paddingLeft: "16px" }}>
+          {yard.description && <p style={muted}>{yard.description}</p>}
+          {yard.beds.length === 0 ? (
+            <p style={muted}>No beds yet.</p>
+          ) : (
+            <ul style={{ margin: 0, paddingLeft: "16px" }}>
+              {yard.beds.map((bed) => (
+                <li key={bed.id}>{bed.name}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       {error && <p style={errorText}>{error}</p>}
     </li>
   );

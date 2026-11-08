@@ -1,0 +1,19 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Sample residential lot (Richmond, VA)" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-77.47460, 37.55120],
+          [-77.47395, 37.55120],
+          [-77.47395, 37.55060],
+          [-77.47460, 37.55060],
+          [-77.47460, 37.55120]
+        ]]
+      }
+    }
+  ]
+}
