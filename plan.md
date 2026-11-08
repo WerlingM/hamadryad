@@ -786,7 +786,7 @@ Each sprint delivers working, deployable software. Sized for roughly one focused
 
 ---
 
-### Sprint 2 — Homes & Yards
+### Sprint 2 — Homes & Yards ✅ COMPLETE
 
 **Goal:** Create and manage homes with yards; dashboard is functional.
 

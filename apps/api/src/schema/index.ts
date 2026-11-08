@@ -4,9 +4,16 @@
 import { builder } from "./builder";
 
 import "./scalars";
+import "./enums";
 import "./types/user";
 import "./types/auth";
+import "./types/homeMember";
+import "./types/yard";
+import "./types/home";
 import "./queries/me";
+import "./queries/homes";
 import "./mutations/auth";
+import "./mutations/homes";
+import "./mutations/yards";
 
 export const schema = builder.toSchema();

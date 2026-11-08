@@ -22,5 +22,71 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  ownedHomes  Home[]
+  memberships HomeMember[]
+
   @@map("users")
+}
+
+enum MemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum YardLocation {
+  FRONT
+  BACK
+  SIDE_LEFT
+  SIDE_RIGHT
+  OTHER
+}
+
+model Home {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  address       String
+  notes         String?
+  /// Raw imported parcel GeoJSON. The PostGIS geometry column arrives in Sprint 3.
+  parcelGeoJson Json?
+  ownerId       String   @db.Uuid
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  owner   User         @relation(fields: [ownerId], references: [id])
+  members HomeMember[]
+  yards   Yard[]
+
+  @@index([ownerId])
+  @@map("homes")
+}
+
+model HomeMember {
+  id     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  homeId String     @db.Uuid
+  userId String     @db.Uuid
+  role   MemberRole
+
+  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([homeId, userId])
+  @@index([userId])
+  @@map("home_members")
+}
+
+model Yard {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  homeId      String       @db.Uuid
+  name        String
+  location    YardLocation
+  description String?
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  @@index([homeId])
+  @@map("yards")
 }

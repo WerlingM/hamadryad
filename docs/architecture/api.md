@@ -30,28 +30,23 @@ Two things don't fit GraphQL cleanly and stay as plain REST:
 
 `@pothos/plugin-scope-auth` enforces authentication declaratively: an `authenticated` scope is computed once per request from `ctx.user !== null` and can be required on any type or field.
 
-## Current schema (Sprint 1)
+## Home access rules
 
-```graphql
-type Query {
-  me: User
-}
+Every home-related query and mutation requires sign-in and checks the caller's `HomeMember` role (`apps/api/src/lib/homeAccess.ts`):
 
-type Mutation {
-  login(input: LoginInput!): AuthPayload!
-  register(input: RegisterInput!): AuthPayload!
-}
+| Action | Allowed roles |
+|---|---|
+| See a home and its yards (`homes`, `home`) | Owner, Editor, Viewer |
+| Edit a home, add/edit/delete yards | Owner, Editor |
+| Delete a home | Owner |
 
-type User {
-  id: ID!
-  email: String!
-  displayName: String!
-}
+Non-members get `NOT_FOUND` (not `FORBIDDEN`) so home and yard IDs aren't confirmed to people who can't see them; `home(id)` simply returns `null`. Members with too low a role get `FORBIDDEN`. `Home.myRole` exposes the caller's role so the UI can hide actions they can't take.
 
-type AuthPayload {
-  token: String!
-  user: User!
-}
-```
+Error codes the client can rely on: `UNAUTHENTICATED` (missing/expired token — the web client refreshes the token and retries once), `BAD_USER_INPUT` (validation; inputs are checked with zod), `NOT_FOUND`, `FORBIDDEN`.
 
-The full target schema (homes, yards, beds, plantings, catalog, irrigation, reports) is specified in the [roadmap](../../plan.md#4-backend-api-design--graphql) and lands incrementally over the following sprints.
+## Implemented schema
+
+- **Sprint 1:** `me`, `login`, `register`.
+- **Sprint 2:** `homes`, `home(id)`, `Home.yards(filter: YardFilter)` (filter by `location`, ordered by `sortOrder`), `Home.members`, `Home.myRole`, and `createHome` / `updateHome` / `deleteHome`, `createYard` / `updateYard` / `deleteYard`.
+
+The live schema is the source of truth — introspect `http://localhost:3001/graphql` or read `apps/api/src/schema/`. The full target schema (beds, plantings, catalog, irrigation, reports) is specified in the [roadmap](../../plan.md#4-backend-api-design--graphql) and lands incrementally over the following sprints.

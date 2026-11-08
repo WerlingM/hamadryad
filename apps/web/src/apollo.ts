@@ -22,12 +22,16 @@ const authLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-const errorLink = onError(({ networkError, operation, forward }) => {
-  if (
-    networkError &&
-    "statusCode" in networkError &&
-    networkError.statusCode === 401
-  ) {
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  const httpUnauthorized =
+    !!networkError && "statusCode" in networkError && networkError.statusCode === 401;
+  const gqlUnauthenticated = graphQLErrors?.some(
+    (err) => err.extensions?.code === "UNAUTHENTICATED"
+  );
+  // Only refresh when an authenticated request was rejected (e.g. expired token),
+  // not for failed logins. The retried request goes straight to httpLink, so no loop.
+  const hadToken = !!useAuthStore.getState().token;
+  if ((httpUnauthorized || gqlUnauthenticated) && hadToken) {
     return new Observable((observer) => {
       fetch("/auth/refresh", { method: "POST", credentials: "include" })
         .then((res) => {
@@ -52,7 +56,7 @@ const errorLink = onError(({ networkError, operation, forward }) => {
         })
         .catch(() => {
           useAuthStore.getState().clearAuth();
-          observer.error(networkError);
+          observer.error(networkError ?? graphQLErrors?.[0]);
         });
     });
   }

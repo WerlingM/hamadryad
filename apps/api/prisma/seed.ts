@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/auth";
+import { seedHomes } from "./seedHomes";
 
 const prisma = new PrismaClient();
 
@@ -14,18 +15,18 @@ async function main() {
     );
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
+  let user = await prisma.user.findUnique({ where: { email } });
+  if (user) {
     console.log(`Admin user already exists: ${email} — skipping.`);
-    return;
+  } else {
+    const passwordHash = await hashPassword(password);
+    user = await prisma.user.create({
+      data: { email, displayName, passwordHash },
+    });
+    console.log(`Created admin user: ${user.email} (id: ${user.id})`);
   }
 
-  const passwordHash = await hashPassword(password);
-  const user = await prisma.user.create({
-    data: { email, displayName, passwordHash },
-  });
-
-  console.log(`Created admin user: ${user.email} (id: ${user.id})`);
+  await seedHomes(prisma, user.id);
 }
 
 main()

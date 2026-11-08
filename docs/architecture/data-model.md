@@ -10,7 +10,7 @@ Home → Yard → Bed → Planting → CatalogSpecies
 
 A `Home` is a property (e.g., "Suburban Home", "Richmond Rental"). Each home has one or more `Yard`s (front, back, side). Each yard has `Bed`s, the primary organizational unit — a bed is a drawn polygon with sunlight/moisture attributes. Each bed holds `Planting`s, which are instances of a shared `CatalogSpecies` (e.g., "Purple Coneflower / *Echinacea purpurea*"). The catalog is shared across all homes and users, so a planting that thrived at one property is an easy candidate to suggest at another.
 
-**Built today:** only `User`. Everything below it is planned schema for future sprints — see the [roadmap](../../plan.md#3-database-schema) for the section this is drawn from and when each entity lands.
+**Built today:** `User`, `Home`, `HomeMember`, and `Yard`. Everything below them is planned schema for future sprints — see the [roadmap](../../plan.md#3-database-schema) for the section this is drawn from and when each entity lands.
 
 ## Entities
 
@@ -23,28 +23,31 @@ A `Home` is a property (e.g., "Suburban Home", "Richmond Rental"). Each home has
 | passwordHash | TEXT | bcrypt, never exposed via GraphQL |
 | createdAt / updatedAt | TIMESTAMPTZ | |
 
-### Home *(planned)*
+### Home *(implemented)*
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID PK | |
 | name | TEXT | |
 | address | TEXT | |
 | notes | TEXT | nullable |
-| parcelGeometry | geometry(MultiPolygon,4326) | via raw SQL, nullable |
+| parcelGeometry | geometry(MultiPolygon,4326) | via raw SQL, nullable — *added in Sprint 3* |
 | parcelGeoJson | JSONB | raw imported GeoJSON, nullable |
 | ownerId | UUID FK → User | |
 
-### HomeMember *(planned)*
-Join table granting a `User` a `role` (`OWNER` / `EDITOR` / `VIEWER`) on a `Home`.
+### HomeMember *(implemented)*
+Join table granting a `User` a `role` (`OWNER` / `EDITOR` / `VIEWER`) on a `Home`. Unique per (home, user). Creating a home also creates an `OWNER` membership for its creator; access checks always go through this table, not `Home.ownerId`.
 
-### Yard *(planned)*
+### Yard *(implemented)*
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID PK | |
 | homeId | UUID FK → Home | |
 | name | TEXT | "Front Yard", "Back Yard" |
 | location | ENUM | `FRONT` / `BACK` / `SIDE_LEFT` / `SIDE_RIGHT` / `OTHER` |
-| sortOrder | INT | |
+| description | TEXT | nullable |
+| sortOrder | INT | display order within the home; new yards go last |
+
+Deleting a home cascades to its memberships and yards.
 
 ### Bed *(planned)*
 | Column | Type | Notes |

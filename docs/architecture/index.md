@@ -41,4 +41,4 @@ See [Data Model](data-model.md) for the entity schema and [API Design](api.md) f
 
 ## Status
 
-Only the `User` entity and authentication exist today (Sprint 1). The full entity hierarchy in [Data Model](data-model.md) — homes, yards, beds, plantings, the catalog, irrigation — is the target schema for later sprints; see the [roadmap](../../plan.md) for sequencing.
+`User`, `Home`, `HomeMember`, and `Yard` exist today (Sprints 1–2). The rest of the hierarchy in [Data Model](data-model.md) — beds, plantings, the catalog, irrigation — is the target schema for later sprints; see the [roadmap](../../plan.md) for sequencing.

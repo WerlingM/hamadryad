@@ -1,0 +1,15 @@
+mutation CreateYard($homeId: ID!, $input: CreateYardInput!) {
+  createYard(homeId: $homeId, input: $input) {
+    ...YardFields
+  }
+}
+
+mutation UpdateYard($id: ID!, $input: UpdateYardInput!) {
+  updateYard(id: $id, input: $input) {
+    ...YardFields
+  }
+}
+
+mutation DeleteYard($id: ID!) {
+  deleteYard(id: $id)
+}

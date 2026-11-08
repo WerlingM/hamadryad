@@ -1,0 +1,50 @@
+fragment HomeSummary on Home {
+  id
+  name
+  address
+  notes
+  myRole
+}
+
+fragment YardFields on Yard {
+  id
+  name
+  location
+  description
+  sortOrder
+}
+
+query Homes {
+  homes {
+    ...HomeSummary
+    yards {
+      id
+      name
+    }
+  }
+}
+
+query Home($id: ID!) {
+  home(id: $id) {
+    ...HomeSummary
+    yards {
+      ...YardFields
+    }
+  }
+}
+
+mutation CreateHome($input: CreateHomeInput!) {
+  createHome(input: $input) {
+    ...HomeSummary
+  }
+}
+
+mutation UpdateHome($id: ID!, $input: UpdateHomeInput!) {
+  updateHome(id: $id, input: $input) {
+    ...HomeSummary
+  }
+}
+
+mutation DeleteHome($id: ID!) {
+  deleteHome(id: $id)
+}

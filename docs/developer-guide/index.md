@@ -15,23 +15,26 @@ apps/
     src/
       index.ts          Express + Apollo Server entry point
       context.ts        per-request GraphQL context (auth lookup, prisma client)
-      lib/               auth (JWT/bcrypt), prisma client singleton
+      lib/               auth (JWT/bcrypt), prisma client, home access checks, input validation
       schema/
         builder.ts       the single Pothos SchemaBuilder instance
         scalars.ts       DateTime / Date / JSON scalars
+        enums.ts         GraphQL enums mapped from Prisma enums
         types/           Pothos object types (one file per GraphQL type)
         queries/         root Query fields
         mutations/       root Mutation fields
     prisma/
       schema.prisma      database schema (source of truth)
       migrations/
-      seed.ts
+      seed.ts            admin user + sample homes (seedHomes.ts)
   web/                  React (Vite) frontend
     src/
-      apollo.ts          Apollo Client instance (auth header, 401 retry)
+      apollo.ts          Apollo Client instance (auth header, token refresh + retry)
       router.tsx         React Router route table
       stores/            Zustand stores (auth token, future UI state)
-      pages/             route-level components, each with a co-located .graphql file
+      pages/             route-level components, with co-located .graphql operations
+      components/        reusable pieces (layout, ui styles, homes, yards)
+      lib/               small shared helpers (labels, roles, error messages)
       gql/graphql.ts      generated types + Apollo hooks — do not hand-edit
 docs/                   this documentation
 codegen.ts               GraphQL Code Generator config (root — spans both apps)
@@ -45,7 +48,7 @@ docker-compose.dev.yml   dev override (db only; api/web run locally with hot rel
 2. `pnpm install` at the repo root (installs for both workspace packages).
 3. Start Postgres only: `podman compose -f docker-compose.yml -f docker-compose.dev.yml up db`. `docker-compose.dev.yml` disables the `api`/`web` services and publishes Postgres on `localhost:5432` for local tools to reach.
 4. Apply migrations: `pnpm db:migrate` (interactive, dev-friendly) or `pnpm db:migrate:deploy` (non-interactive, matches production).
-5. Seed an admin user: `pnpm seed` — reads `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_DISPLAY_NAME` from `.env`. Safe to re-run; skips if the user already exists.
+5. Seed data: `pnpm seed` — creates the admin user from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_DISPLAY_NAME` in `.env`, plus sample homes ("Suburban Home", "Richmond Rental") each with front and back yards. Safe to re-run; skips anything that already exists.
 
 ## Day-to-day dev loop
 

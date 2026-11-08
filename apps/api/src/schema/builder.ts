@@ -1,4 +1,5 @@
 import SchemaBuilder from "@pothos/core";
+import { GraphQLError } from "graphql";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PrismaTypes, { getDatamodel } from "@pothos/plugin-prisma/generated";
@@ -24,7 +25,9 @@ export const builder = new SchemaBuilder<{
       authenticated: ctx.user !== null,
     }),
     unauthorizedError: (_parent, _ctx, info) =>
-      new Error(`Not authenticated: ${info.fieldName}`),
+      new GraphQLError(`Not authenticated: ${info.fieldName}`, {
+        extensions: { code: "UNAUTHENTICATED" },
+      }),
   },
   prisma: {
     client: (ctx) => ctx.prisma,

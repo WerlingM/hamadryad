@@ -77,3 +77,6 @@ pgdata
 .env
 .envrc
 node_modules
+
+# Build output
+dist
