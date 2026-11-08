@@ -16,7 +16,8 @@ Use podman, podman compose instead of docker.
 
 
 # Documentation
-* In general do not include code in documentation for plans.  Only have code in documentation where it is useful as an example, identifies a special edge case or technique
+* In general do not include code in documentation for plans in the repo.
+* Only have code in documentation where it is useful as an example, identifies a special edge case or technique
 * Put documentation in docs folder at root of project
 * All documentation should be accessible via links in a hierarchical structure, with an index.md file at the top level of the docs folder
 * Do not duplicate documentation, instead use links to single source, including in the project README.md file
